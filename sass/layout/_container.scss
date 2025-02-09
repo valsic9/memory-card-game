@@ -1,0 +1,19 @@
+@use '../abstracts/mixins' as *;
+
+.container {
+    max-width: 1200px;
+    padding: 30px 20px;
+
+    .header {
+        margin-bottom: 35px;
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        p {
+            margin-bottom: 30px;
+            max-width: 80vw;
+        }
+
+    }
+}
