@@ -1,3 +1,4 @@
+// This class  handles the timers
 class Stopwatch {
   min; 
   sec; 

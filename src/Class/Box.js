@@ -1,29 +1,22 @@
+// Class Box handles the cards of the game, storing their data
+// Takes on the click event for each card and the reset of their color to black
+
 class Box {
-    #row;
-    #col;
+    #nCards;
     #color;
     #open;
     #free;
     divElement;
 
-    constructor(row, col, color, free = true, open = false) {
-        this.#row = row;
-        this.#col = col;
+    constructor(nCards, color, free = true, open = false) {
+        this.#nCards = nCards;
         this.#color = color;
         this.#free = free;
         this.#open = open;
     }
 
-    get row() {
-        return this.#row
-    }
-
-    get col() {
-        return this.#col
-    }
-
-    get row() {
-        return this.#col
+    get nCards() {
+        return this.#nCards
     }
 
     get open() {
@@ -41,6 +34,7 @@ class Box {
         this.#free = val
     }
 
+    // Click ob box reveals its true colour
     addClickEvent() {
         if (this.divElement) {
             this.divElement.addEventListener('click', (e) => {
@@ -53,6 +47,7 @@ class Box {
         }
     }
 
+    // Reset the visible colour of the box to black
     resetColor() {
         this.divElement.style.backgroundColor = 'black';
         this.#open = false;

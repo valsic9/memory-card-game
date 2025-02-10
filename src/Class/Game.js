@@ -2,24 +2,22 @@ import { shuffle } from "../utils/utils";
 import Box from "./Box";
 import Stopwatch from "./Stopwatch";
 
+// Class Game handles the board and includes the boxes of the game
 class Game {
-    #rows;
-    #cols;
+    #nCards;
     #idElement;
     #boxes;
     #board;
     stopwatch;
 
-    constructor(rows, cols, idElement="game") {
+    constructor(nCards, idElement="game") {
         console.log('New game created')
-        this.#rows = rows;
-        this.#cols = cols;
+        this.#nCards = nCards;
         this.#idElement = idElement;
         this.#board = document.getElementById(idElement);
         this.#boxes = [];
         this.createBoxes();
         this.paintBoxes();
-        // this.setCSSGridTemplate();
 
         this.#board.addEventListener('click', ()=> {
             this.checkOpenBoxes();
@@ -28,13 +26,50 @@ class Game {
         this.initTimer()
     }
 
-    get rows() {
-        return this.#rows;
+    get nCards() {
+        return this.#nCards
     }
 
+    // Generating random colors for each box's background-color. Number of colors
+    // equals half the number of cards
+    getRandomColors() {
+        let randomColors = [];
+        for (let i = 0; i < this.nCards / 2; i++) { 
+            let red = Math.floor(Math.random() * 256);
+            let green = Math.floor(Math.random() * 256);
+            let blue = Math.floor(Math.random() * 256);
+            let color = `rgb(${red}, ${green}, ${blue})`;
+            randomColors.push(color);
+        }
+    
+        randomColors = [...randomColors, ...randomColors];
+        shuffle(randomColors);
+        return randomColors;
+    }
 
+    // Asks the user for input, must be an even number to set the amout of cards or boxes in the board
+    static getNumberOfCards() {
+        let nCards; 
+        if (localStorage.getItem('nCards') !== null) {
+            nCards = parseInt(localStorage.getItem('nCards'))
+        } else {
+            nCards = parseInt(prompt('Introduce a number of cards:'))
+            
+            while (nCards % 2 !== 0) {
+                alert('The total amount of cards must be an even number.')
+                nCards = parseInt(prompt('Introduce a number of cards:'))
+            }            
+        }
+
+        localStorage.setItem('nCards', nCards)
+
+        return nCards  
+    }
+
+    // Checks if there are 2 open boxes in the board to lock them in their real colour, 
+    // otherwise reset the color to black. Then checks if all boxes are locked open
     checkOpenBoxes() {
-        // Check if there are 2 open boxes in the board to lock them
+        
         let nOpenBoxes = this.#boxes.filter(box => box.open && box.free);
         if (nOpenBoxes.length === 2) {
             if (nOpenBoxes[0].color === nOpenBoxes[1].color) {
@@ -61,28 +96,10 @@ class Game {
             // Set a delay so that the game has time to turn around the last card before finishing 
           setTimeout(() => {
             this.stopwatch.stop();
-            alert("Juego finalizado");
+            alert("Congratulations! You've found all pairs.");
           }, 200);
         }
       }
-
-    getRandomColors() {
-        let randomColors = [];
-
-        // Create colors. We need half of the total amount of boxes and 
-        // then duplicate them to make pairs of same color
-        for (let i = 0; i < (this.#cols*this.#rows) / 2; i++) {
-            let red = Math.floor(Math.random() * 256);
-            let green = Math.floor(Math.random() * 256);
-            let blue = Math.floor(Math.random() * 256);
-            let color = `rgb(${red}, ${green}, ${blue})`;
-            randomColors.push(color);
-        }
-    
-        randomColors = [...randomColors, ...randomColors];
-        shuffle(randomColors);
-        return randomColors;
-    }
     
     // Creates instances of the Box class with different colors and stores them in an array
     createBoxes() {
@@ -91,28 +108,26 @@ class Game {
         if (localStorage.getItem('boxes') !== null) {
             let arrayBoxesFromLocalStorage = JSON.parse(localStorage.getItem('boxes'));
             arrayBoxesFromLocalStorage.map(box => {
-                let newBox = new Box(box.row, box.col, box.color, box.free, box.open);
+                let newBox = new Box(box.nCards, box.color, box.free, box.open); // box.row, box.col
                 this.#boxes.push(newBox);
             })
         // If there is no previus game, create new boxes from scratch and save them in LocalStorage
         } else {
-            let randomColors = this.getRandomColors()
-            for (let row = 0; row < this.#rows; row++) {
-                for (let col = 0; col < this.#cols; col++) {
-                    let color = randomColors.shift()
-                    let newBox = new Box(row, col, color)
-                    this.#boxes.push(newBox)
-                }
+            let randomColors = this.getRandomColors()           
+            for (let nCards = 0; nCards < this.nCards; nCards++) {
+                let color = randomColors.shift()
+                let newBox = new Box(nCards, color)
+                this.#boxes.push(newBox)
+                this.arrayBoxesToLocalStorage()
             }
-            this.arrayBoxesToLocalStorage()
         }
     }
 
+    // Creates an array of objects that contain the attributes of each box
     arrayBoxesToLocalStorage() {
         let arrayBoxesToLocalStorage = this.#boxes.map(box => {
             return {
-                row : box.row,
-                col : box.col,
+                nCards : box.nCards,
                 color : box.color,
                 free : box.free,
                 open : box.open,
@@ -121,6 +136,8 @@ class Game {
         localStorage.setItem('boxes', JSON.stringify(arrayBoxesToLocalStorage));
     }
 
+    // Create and append in the DOM a header for the timer and a grid container for the boxes
+    // Reveals a box's real color if opened and locked
     paintBoxes() {
         let header = document.createElement('header');
         header.setAttribute('id', 'boxHeader')
@@ -142,43 +159,14 @@ class Game {
         })
     }
 
-    // setCSSGridTemplate() {
-    //     boxesContainer.style.gridTemplateColumns = `repeat(${this.#cols}, 1fr)`
-    //     boxesContainer.style.gridTemplateRows = `repeat(${this.#rows}, 1fr)`
-    // }
-
-    static getRowsCols() {
-        let rows; 
-        let cols;
-
-        if (localStorage.getItem('rows') !== null && localStorage.getItem('cols') !== null) {
-            rows = parseInt(localStorage.getItem('rows'))
-            cols = parseInt(localStorage.getItem('cols'))
-        } else {
-            rows = parseInt(prompt('Introduce a number of rows:'))
-            cols = parseInt(prompt('Introduce a number of columns:'))
-            
-            while (rows * cols % 2 !== 0) {
-                alert('The total amount of cards must be an even number.')
-                rows = parseInt(prompt('Introduce a number of rows:'))
-                cols = parseInt(prompt('Introduce a number of columns:'))
-            }            
-        }
-
-        localStorage.setItem('rows', rows)
-        localStorage.setItem('cols', cols)
-
-        return {
-            'rows': rows,
-            'cols': cols,
-        }  
-    }
-
+    // Function to reset LocalStorage and reload the page
     static resetGame() {
         localStorage.clear()
         location.reload()
     }
 
+    // Creates and appends DOM elements to visualize the timer
+    // Creates and instance of the Stpwatch class and starts counting when called
     initTimer() {
         let timerWrapper = document.createElement('h2')
         timerWrapper.setAttribute('id', 'timerWrapper')

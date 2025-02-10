@@ -7,10 +7,9 @@ resetBtn.addEventListener('click', (e) => {
     Game.resetGame()
 })
 
-let boardGrid = Game.getRowsCols();
-let rows = boardGrid.rows;
-let cols = boardGrid.cols;
+// Asking user for input (number of cards)
+let nCards = Game.getNumberOfCards();
 
-const game = new Game(rows, cols, 'game');
+const game = new Game(nCards, 'game');
 const box = new Box();
 
