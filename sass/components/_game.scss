@@ -17,19 +17,43 @@
 #boxesContainer {
     max-width: 400px;
     display: grid;
+    align-items: center;
+    justify-content: center;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
+    gap: 5px;
     margin-left: auto;
     margin-right: auto;
     @include breakpoint(tablet) {
         max-width: 600px;
+        gap: 10px;
     };
+    @include breakpoint(tablethorizontal) {
+        max-width: 700px;
+        gap: 10px;
+    };
+    @include breakpoint(desktop) {
+        max-width: 800px;
+        gap: 20px;
+      };
 }
 
 .box {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     background-color: black;
+
+    @include breakpoint(tablet) {
+        width: 100px;
+        height: 100px;
+    };
+    @include breakpoint(tablethorizontal) {
+        width: 100px;
+        height: 100px;
+    };
+    @include breakpoint(desktop) {
+        width: 120px;
+        height: 120px;
+      };
 
 	--angle: 0deg;
 	border: 5px solid;
@@ -43,4 +67,7 @@
     syntax: '<angle>';
     initial-value: 0deg;
     inherits: false;
-  }
+}
+
+
+

@@ -1,15 +1,31 @@
 @use '../abstracts/variables' as *;
 @use '../base/animations' as *;
+@use '../abstracts/mixins' as *;
 
 #reset {
     display: inline-block;
     background-color: $red-color;
     border: 0px;
-    border-radius: 25px;
-    padding: 12px 24px;
+    border-radius: 28px;
+    padding: 14px 28px;
+    font-size: 18px;
+    color: $blue-color;
+    font-weight: 600;
+    @include breakpoint(tablet) {
+      font-size: 20px;
+      padding: 18px 30px;
+  };
+  @include breakpoint(desktop) {
+    font-size: 22px;
+    padding: 20px 30px;
+  };
 
     &:hover{
-        background-image:     linear-gradient(
+      transform: translate(-3px, -3px);
+      transition: translate 2s 1s ease-in;
+      transition: font-size 2s 1s ease-in;
+      color: $grey-color;
+      background-image:     linear-gradient(
            to right, 
            #E7484F,
            #E7484F 16.65%,
